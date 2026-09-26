@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Cụ Xếp Ca Tự Động & Quản Lý Nhân Viên</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #f8fafc; }
+        
+        /* Hiệu ứng ô khóa cố định */
+        .cell-fixed {
+            border: 2px solid #2563eb !important;
+            font-weight: 800 !important;
+            box-shadow: 0 0 0 1px #2563eb;
+        }
+
+        /* Bảng mã màu riêng biệt từng nhân viên */
+        .emp-color-PHÚC  { background-color: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+        .emp-color-LINH  { background-color: #fce7f3; color: #9d174d; border-color: #fbcfe8; }
+        .emp-color-NHUNG { background-color: #ffedd5; color: #9a3412; border-color: #fed7aa; }
+        .emp-color-VY    { background-color: #f3e8ff; color: #6b21a8; border-color: #e9d5ff; }
+        .emp-color-DUY   { background-color: #ccfbf1; color: #115e59; border-color: #99f6e4; }
+        .emp-color-HƯƠNG { background-color: #fef9c3; color: #854d0e; border-color: #fef08a; }
+        .emp-color-HIN   { background-color: #dcfce7; color: #166534; border-color: #86efac; }
+        .emp-color-NOI   { background-color: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+        .emp-color-DEFAULT { background-color: #f1f5f9; color: #334155; border-color: #cbd5e1; }
+    </style>
+</head>
+<body class="p-4 md:p-6 text-slate-800">
+
+    <div class="max-w-[1600px] mx-auto space-y-6">
+        
+        <!-- HEADER & CA LÀM VIỆC INFO -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+            <h1 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-calendar-days text-indigo-600"></i>
+                Hệ Thống Xếp Ca Tự Động Cửa Hàng
+            </h1>
+            <div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
+                <span class="text-slate-500">Các ca:</span>
+                <span class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-lg">PT1: 6:30-12:00</span>
+                <span class="bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg">FT1: 6:30-15:00</span>
+                <span class="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-lg">PT2: 9:00-15:00</span>
+                <span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg">PT3: 12:00-17:00</span>
+                <span class="bg-purple-100 text-purple-700 px-2.5 py-1 rounded-lg">FT2: 15:00-23:30</span>
+                <span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg">PT4: 17:00-23:30</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- CỘT BÊN TRÁI: FORM NHẬP & DANH SÁCH NHÂN VIÊN -->
+            <div class="lg:col-span-4 space-y-6">
+                
+                <!-- FORM NHẬP / CHỈNH SỬA THÔNG TIN -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <h2 id="formTitle" class="text-md font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-indigo-600"></i> Nhập Thông Tin Nhân Viên
+                        </h2>
+                        <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden text-xs text-rose-600 font-bold hover:underline">
+                            Hủy chỉnh sửa
+                        </button>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="font-bold text-slate-700">1. Tên Nhân Viên:</label>
+                            <input type="text" id="empName" placeholder="VD: HIN, LINH, PHÚC..." class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 uppercase font-semibold">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="font-bold text-slate-700">2. Khả năng:</label>
+                                <select id="empLevel" class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 font-medium">
+                                    <option value="Giỏi">Giỏi</option>
+                                    <option value="Trung bình" selected>Trung bình</option>
+                                    <option value="Yếu">Yếu</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-700">3. Số ca max/tuần:</label>
+                                <input type="number" id="empMaxShifts" value="5" min="1" max="14" class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 font-semibold">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="font-bold text-slate-700">4. Thời gian rảnh có thể làm:</label>
+                            <textarea id="empAvail" rows="2" placeholder="T2, T5, CN: cả ngày&#10;T7: 17h - 23h" class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-1">Các ca KHÔNG THỂ LÀM (Cấm):</label>
+                            <div class="grid grid-cols-2 gap-1.5 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <label class="flex items-center gap-1.5"><input type="checkbox" value="FT1" class="emp-forbidden-chk"> FT1 (6:30-15:00)</label>
+                                <label class="flex items-center gap-1.5"><input type="checkbox" value="FT2" class="emp-forbidden-chk"> FT2 (15:00-23:30)</label>
+                                <label class="flex items-center gap-1.5"><input type="checkbox" value="PT1" class="emp-forbidden-chk"> PT1 (6:30-12:00)</label>
+                                <label class="flex items-center gap-1.5"><input type="checkbox" value="PT2" class="emp-forbidden-chk"> PT2 (09:00-15:00)</label>
+                                <label class="flex items-center gap-1.5"><input type="checkbox" value="PT3" class="emp-forbidden-chk"> PT3 (12:00-17:00)</label>
+                                <label class="flex items-center gap-1.5 text-rose-600 font-bold"><input type="checkbox" value="PT4" class="emp-forbidden-chk"> PT4 (17:00-23:30)</label>
+                            </div>
+                        </div>
+
+                        <button id="saveEmpBtn" onclick="saveEmployee()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm">
+                            + Thêm Nhân Viên Vào Danh Sách
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DANH SÁCH NHÂN VIÊN -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex justify-between items-center">
+                        <span>Danh Sách Nhân Viên (<span id="empCount">0</span>)</span>
+                    </h3>
+                    <div id="employeeList" class="space-y-2 max-h-[350px] overflow-y-auto pr-1"></div>
+                </div>
+
+            </div>
+
+            <!-- CỘT BÊN PHẢI: BẢNG LỊCH XẾP CA REALTIME -->
+            <div class="lg:col-span-8 space-y-6">
+                
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-3">
+                        <div>
+                            <h2 class="text-md font-bold text-slate-900">Bảng Lịch Làm Việc Tuần</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                💡 Chọn tên trực tiếp trên bảng để <b>khóa ca cố định 🔒</b>. Auto-fill sẽ <b>không xếp 2 ca/ngày</b>[cite: 2].
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <button onclick="autoFillRemaining()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> ⚡ Tự Động Fill Ca Trống
+                            </button>
+                            <button onclick="resetSchedule()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs px-3 py-2.5 rounded-xl transition-all">
+                                Xóa Lịch
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- BẢNG LỊCH -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse text-xs text-center">
+                            <thead>
+                                <tr class="bg-slate-900 text-white font-bold uppercase tracking-wider">
+                                    <th class="p-3 border border-slate-700 w-32 rounded-tl-lg">CA LÀM VIỆC</th>
+                                    <th class="p-3 border border-slate-700">T2</th>
+                                    <th class="p-3 border border-slate-700">T3</th>
+                                    <th class="p-3 border border-slate-700">T4</th>
+                                    <th class="p-3 border border-slate-700">T5</th>
+                                    <th class="p-3 border border-slate-700">T6</th>
+                                    <th class="p-3 border border-slate-700">T7</th>
+                                    <th class="p-3 border border-slate-700 rounded-tr-lg">CN</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduleBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- THỐNG KÊ PHÂN BỔ CA -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Thống kê phân bổ số ca:</h3>
+                    <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        const SHIFTS = [
+            { id: "PT1", name: "6:30 - 12:00" },
+            { id: "FT1", name: "6:30 - 15:00" },
+            { id: "PT2", name: "09:00 - 15:00" },
+            { id: "PT3", name: "12:00 - 17:00" },
+            { id: "FT2", name: "15:00 - 23:30" },
+            { id: "PT4", name: "17:00 - 23:30" }
+        ];
+
+        const DAYS = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+
+        let employees = [
+            { name: "HIN", level: "Giỏi", maxShifts: 7, avail: "T2-CN: cả ngày", forbidden: [] },
+            { name: "LINH", level: "Giỏi", maxShifts: 5, avail: "T2-T6: 6:30-15:00", forbidden: ["FT2", "PT4"] },
+            { name: "PHÚC", level: "Giỏi", maxShifts: 5, avail: "T2, T5, CN cả ngày; T7: 17h-23h", forbidden: [] },
+            { name: "VY", level: "Trung bình", maxShifts: 6, avail: "Cả tuần", forbidden: [] },
+            { name: "DUY", level: "Giỏi", maxShifts: 5, avail: "T2 cả ngày; T4, T6: 15h-23h30", forbidden: [] },
+            { name: "NHUNG", level: "Trung bình", maxShifts: 5, avail: "Cả tuần", forbidden: [] },
+            { name: "HƯƠNG", level: "Trung bình", maxShifts: 5, avail: "T3, T5, T6, T7, CN: sáng/chiều", forbidden: ["FT2", "PT4"] },
+            { name: "NOI", level: "Giỏi", maxShifts: 3, avail: "T2-T6 : 9h-17h", forbidden: ["PT4"] }
+        ];
+
+        let scheduleState = {};
+        let editingIndex = -1; // -1 là chế độ Thêm mới, >=0 là chỉ số đang Sửa
+
+        window.onload = function() {
+            DAYS.forEach((day, idx) => {
+                scheduleState[`FT1_${idx}`] = { emp: "HIN", isFixed: true };
+            });
+
+            renderEmployeeList();
+            initScheduleTable();
+            updateStats();
+        };
+
+        function getEmpColorClass(empName) {
+            if (!empName) return "emp-color-DEFAULT";
+            return `emp-color-${empName}` || "emp-color-DEFAULT";
+        }
+
+        function renderEmployeeList() {
+            const listEl = document.getElementById("employeeList");
+            document.getElementById("empCount").innerText = employees.length;
+            listEl.innerHTML = "";
+
+            employees.forEach((emp, idx) => {
+                const badgeLevel = emp.level === 'Giỏi' ? 'bg-emerald-100 text-emerald-700' : (emp.level === 'Trung bình' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700');
+                const forbiddenText = emp.forbidden.length > 0 ? `Cấm: ${emp.forbidden.join(', ')}` : 'Không cấm ca';
+
+                listEl.innerHTML += `
+                    <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+                        <div class="space-y-0.5">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-bold text-slate-800">${emp.name}</span>
+                                <span class="px-2 py-0.5 rounded-md font-semibold text-[10px] ${badgeLevel}">${emp.level}</span>
+                                <span class="text-slate-500 text-[10px]">(Max: ${emp.maxShifts} ca)</span>
+                            </div>
+                            <div class="text-[10px] text-slate-500">${emp.avail || 'Không ghi'}</div>
+                            <div class="text-[10px] text-rose-500 font-semibold">${forbiddenText}</div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="editEmployee(${idx})" title="Sửa thông tin" class="text-slate-500 hover:text-indigo-600 p-1.5 rounded-lg hover:bg-slate-200 transition-all">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="removeEmployee(${idx})" title="Xóa nhân viên" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-slate-200 transition-all">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function editEmployee(idx) {
+            editingIndex = idx;
+            const emp = employees[idx];
+
+            document.getElementById("empName").value = emp.name;
+            document.getElementById("empLevel").value = emp.level;
+            document.getElementById("empMaxShifts").value = emp.maxShifts;
+            document.getElementById("empAvail").value = emp.avail || "";
+
+            // Check các ca cấm
+            document.querySelectorAll(".emp-forbidden-chk").forEach(chk => {
+                chk.checked = emp.forbidden.includes(chk.value);
+            });
+
+            // Thay đổi UI Form sang chế độ Sửa
+            document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-user-pen text-indigo-600"></i> Chỉnh Sửa: ${emp.name}`;
+            document.getElementById("saveEmpBtn").innerText = "✓ Cập Nhật Thông Tin Nhân Viên";
+            document.getElementById("saveEmpBtn").className = "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm";
+            document.getElementById("cancelEditBtn").classList.remove("hidden");
+        }
+
+        function cancelEdit() {
+            editingIndex = -1;
+            document.getElementById("empName").value = "";
+            document.getElementById("empLevel").value = "Trung bình";
+            document.getElementById("empMaxShifts").value = "5";
+            document.getElementById("empAvail").value = "";
+            document.querySelectorAll(".emp-forbidden-chk").forEach(chk => chk.checked = false);
+
+            // Chuyển lại UI về Thêm mới
+            document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-user-plus text-indigo-600"></i> Nhập Thông Tin Nhân Viên`;
+            document.getElementById("saveEmpBtn").innerText = "+ Thêm Nhân Viên Vào Danh Sách";
+            document.getElementById("saveEmpBtn").className = "w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm";
+            document.getElementById("cancelEditBtn").classList.add("hidden");
+        }
+
+        function saveEmployee() {
+            const nameInput = document.getElementById("empName");
+            const name = nameInput.value.trim().toUpperCase();
+            const level = document.getElementById("empLevel").value;
+            const maxShifts = parseInt(document.getElementById("empMaxShifts").value);
+            const avail = document.getElementById("empAvail").value.trim();
+
+            if (!name) { alert("Vui lòng nhập tên nhân viên!"); return; }
+
+            const forbidden = [];
+            document.querySelectorAll(".emp-forbidden-chk:checked").forEach(chk => {
+                forbidden.push(chk.value);
+            });
+
+            if (editingIndex === -1) {
+                // Thêm mới
+                if (employees.some(e => e.name === name)) { alert("Tên nhân viên đã tồn tại!"); return; }
+                employees.push({ name, level, maxShifts, avail, forbidden });
+            } else {
+                // Cập nhật nhân viên cũ
+                const oldName = employees[editingIndex].name;
+                employees[editingIndex] = { name, level, maxShifts, avail, forbidden };
+
+                // Nếu đổi tên, cập nhật tên mới vào bảng lịch
+                if (oldName !== name) {
+                    for (let key in scheduleState) {
+                        if (scheduleState[key].emp === oldName) {
+                            scheduleState[key].emp = name;
+                        }
+                    }
+                }
+            }
+
+            cancelEdit();
+            renderEmployeeList();
+            initScheduleTable();
+            updateStats();
+        }
+
+        function removeEmployee(idx) {
+            const empName = employees[idx].name;
+            if (confirm(`Bạn có chắc muốn xóa nhân viên ${empName}?`)) {
+                // Xóa khỏi lịch làm việc
+                for (let key in scheduleState) {
+                    if (scheduleState[key].emp === empName) {
+                        delete scheduleState[key];
+                    }
+                }
+                employees.splice(idx, 1);
+                if (editingIndex === idx) cancelEdit();
+                renderEmployeeList();
+                initScheduleTable();
+                updateStats();
+            }
+        }
+
+        function initScheduleTable() {
+            const tbody = document.getElementById("scheduleBody");
+            tbody.innerHTML = "";
+
+            SHIFTS.forEach(shift => {
+                let rowHtml = `<tr class="border-b border-slate-100"><td class="p-3 font-bold text-slate-700 bg-slate-50 border border-slate-200 text-left">${shift.name}</td>`;
+
+                DAYS.forEach((day, dayIdx) => {
+                    const key = `${shift.id}_${dayIdx}`;
+                    const item = scheduleState[key] || { emp: "", isFixed: false };
+
+                    let options = `<option value="">-- Trống --</option>`;
+                    employees.forEach(e => {
+                        options += `<option value="${e.name}" ${item.emp === e.name ? 'selected' : ''}>${e.name}</option>`;
+                    });
+
+                    const colorClass = getEmpColorClass(item.emp);
+                    const fixedClass = item.isFixed ? "cell-fixed" : "";
+
+                    rowHtml += `
+                        <td class="p-1.5 border border-slate-200">
+                            <select id="sel_${key}" class="w-full py-2 px-1 text-center font-bold rounded-xl border outline-none cursor-pointer transition-all ${colorClass} ${fixedClass}" onchange="onManualCellChange('${key}', this.value)">
+                                ${options}
+                            </select>
+                        </td>
+                    `;
+                });
+
+                rowHtml += `</tr>`;
+                tbody.innerHTML += rowHtml;
+            });
+
+            updateStats();
+        }
+
+        function onManualCellChange(key, value) {
+            if (value === "") {
+                delete scheduleState[key];
+            } else {
+                scheduleState[key] = { emp: value, isFixed: true };
+            }
+            initScheduleTable();
+        }
+
+        function autoFillRemaining() {
+            let counts = {};
+            employees.forEach(e => counts[e.name] = 0);
+
+            for (let key in scheduleState) {
+                if (scheduleState[key] && scheduleState[key].emp) {
+                    let name = scheduleState[key].emp;
+                    if (counts[name] !== undefined) counts[name]++;
+                }
+            }
+
+            DAYS.forEach((day, dayIdx) => {
+                let workedToday = new Set();
+                SHIFTS.forEach(s => {
+                    const k = `${s.id}_${dayIdx}`;
+                    if (scheduleState[k] && scheduleState[k].emp) {
+                        workedToday.add(scheduleState[k].emp);
+                    }
+                });
+
+                SHIFTS.forEach(shift => {
+                    const key = `${shift.id}_${dayIdx}`;
+
+                    if (scheduleState[key] && scheduleState[key].isFixed) {
+                        return;
+                    }
+
+                    let candidates = employees.filter(e => {
+                        if (counts[e.name] >= e.maxShifts) return false;
+                        if (e.forbidden.includes(shift.id)) return false;
+                        if (workedToday.has(e.name)) return false;
+                        return true;
+                    });
+
+                    if (candidates.length > 0) {
+                        candidates.sort((a, b) => {
+                            if (counts[a.name] !== counts[b.name]) {
+                                return counts[a.name] - counts[b.name];
+                            }
+                            const levelScore = { "Giỏi": 3, "Trung bình": 2, "Yếu": 1 };
+                            return levelScore[b.level] - levelScore[a.level];
+                        });
+
+                        let chosen = candidates[0];
+                        scheduleState[key] = { emp: chosen.name, isFixed: false };
+                        counts[chosen.name]++;
+                        workedToday.add(chosen.name);
+                    }
+                });
+            });
+
+            initScheduleTable();
+        }
+
+        function resetSchedule() {
+            if (confirm("Bạn có chắc muốn xóa tất cả lịch hiện tại?")) {
+                scheduleState = {};
+                initScheduleTable();
+            }
+        }
+
+        function updateStats() {
+            let counts = {};
+            employees.forEach(e => counts[e.name] = 0);
+
+            for (let key in scheduleState) {
+                let item = scheduleState[key];
+                if (item && item.emp && counts[item.emp] !== undefined) {
+                    counts[item.emp]++;
+                }
+            }
+
+            const statsGrid = document.getElementById("statsGrid");
+            statsGrid.innerHTML = "";
+
+            employees.forEach(e => {
+                const count = counts[e.name];
+                const isOver = count > e.maxShifts;
+                const colorClass = getEmpColorClass(e.name);
+
+                statsGrid.innerHTML += `
+                    <div class="p-2.5 rounded-2xl border text-center font-bold ${colorClass}">
+                        <div class="text-xs">${e.name}</div>
+                        <div class="text-[11px] mt-0.5 ${isOver ? 'text-red-600 font-extrabold' : ''}">
+                            ${count} / ${e.maxShifts} ca
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
