@@ -15,7 +15,7 @@
             box-shadow: 0 0 0 1px #2563eb;
         }
 
-        /* Màu nền hiển thị trên giao diện web & dùng màu tương ứng cho Excel */
+        /* Màu nhân viên */
         .emp-color-PHÚC  { background-color: #dbeafe; color: #1e40af; border-color: #93c5fd; }
         .emp-color-LINH  { background-color: #fce7f3; color: #9d174d; border-color: #fbcfe8; }
         .emp-color-NHUNG { background-color: #ffedd5; color: #9a3412; border-color: #fed7aa; }
@@ -26,13 +26,34 @@
         .emp-color-NOI   { background-color: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
         .emp-color-DEFAULT { background-color: #f1f5f9; color: #334155; border-color: #cbd5e1; }
         .emp-color-DISABLED { background-color: #e2e8f0; color: #94a3b8; border-color: #cbd5e1; cursor: not-allowed; }
+
+        /* Style cho Ma trận Free/Busy */
+        .matrix-cell {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .matrix-cell.free {
+            background-color: #bbf7d0 !important;
+            color: #166534;
+            font-weight: bold;
+        }
+        .matrix-cell.busy {
+            background-color: #fecaca !important;
+            color: #991b1b;
+            font-weight: bold;
+        }
+        .matrix-cell.normal {
+            background-color: #ffffff;
+            color: #94a3b8;
+        }
     </style>
 </head>
 <body class="p-4 md:p-6 text-slate-800">
 
     <div class="max-w-[1600px] mx-auto space-y-6">
         
-        <!-- HEADER & CA LÀM VIỆC INFO -->
+        <!-- HEADER -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
             <h1 class="text-xl font-bold text-slate-900 flex items-center gap-2">
                 <i class="fa-solid fa-calendar-days text-indigo-600"></i>
@@ -51,14 +72,13 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- CỘT BÊN TRÁI: FORM NHẬP & DANH SÁCH NHÂN VIÊN -->
-            <div class="lg:col-span-4 space-y-6">
+            <!-- CỘT TRÁI: FORM & MA TRẬN -->
+            <div class="lg:col-span-5 space-y-6">
                 
-                <!-- FORM NHẬP / CHỈNH SỬA THÔNG TIN -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                         <h2 id="formTitle" class="text-md font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-user-plus text-indigo-600"></i> Nhập Thông Tin Nhân Viên
+                            <i class="fa-solid fa-user-plus text-indigo-600"></i> Nhập Thông Tin & Đăng Ký Ca
                         </h2>
                         <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden text-xs text-rose-600 font-bold hover:underline">
                             Hủy chỉnh sửa
@@ -66,14 +86,13 @@
                     </div>
 
                     <div class="space-y-3 text-xs">
-                        <div>
-                            <label class="font-bold text-slate-700">1. Tên Nhân Viên:</label>
-                            <input type="text" id="empName" placeholder="VD: HIN, LINH, PHÚC..." class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 uppercase font-semibold">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="col-span-1">
+                                <label class="font-bold text-slate-700">Tên Nhân Viên:</label>
+                                <input type="text" id="empName" placeholder="VD: HIN..." class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 uppercase font-semibold">
+                            </div>
                             <div>
-                                <label class="font-bold text-slate-700">2. Khả năng:</label>
+                                <label class="font-bold text-slate-700">Khả năng:</label>
                                 <select id="empLevel" class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 font-medium">
                                     <option value="Giỏi">Giỏi</option>
                                     <option value="Trung bình" selected>Trung bình</option>
@@ -81,76 +100,55 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="font-bold text-slate-700">3. Số ca max/tuần:</label>
+                                <label class="font-bold text-slate-700">Max ca/tuần:</label>
                                 <input type="number" id="empMaxShifts" value="5" min="1" max="14" class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 font-semibold">
                             </div>
                         </div>
 
-                        <div>
-                            <label class="font-bold text-slate-700">4. Thời gian rảnh có thể làm:</label>
-                            <textarea id="empAvail" rows="2" placeholder="T2, T5, CN: cả ngày&#10;T7: 17h - 23h" class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600"></textarea>
+                        <!-- 💡 KHU VỰC NHẬP VĂN BẢN (ĐÃ FIX LOGIC) -->
+                        <div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-100 space-y-2">
+                            <label class="font-bold text-indigo-950 flex items-center gap-1.5 text-[11px]">
+                                <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i> Nhập lịch rảnh dạng văn bản tự do:
+                            </label>
+                            <div class="flex gap-2">
+                                <input type="text" id="freeTextPrompt" placeholder="VD: rãnh t2,t5 cả ngày và cn buổi 12-17h" class="w-full p-2 text-xs border border-indigo-200 rounded-lg outline-none focus:border-indigo-600 bg-white">
+                                <button onclick="parseFreeTextToMatrix()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg shrink-0 transition-all text-xs">
+                                    Tạo Matrix
+                                </button>
+                            </div>
+                            <div class="text-[10px] text-slate-500 italic">
+                                *Hỗ trợ: "t2,t5 cả ngày", "cn 12-17h", "t3 sáng", "t4 chiều", "t6 tối"...
+                            </div>
                         </div>
 
-                        <!-- CÁC CA KHÔNG THỂ LÀM (CẤM) -->
-                        <div>
-                            <label class="font-bold text-slate-800 block mb-1.5 flex items-center justify-between">
-                                <span>5. Các ca KHÔNG THỂ LÀM (Cấm):</span>
-                            </label>
-                            
-                            <div class="space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                <div>
-                                    <div class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-700 mb-1 flex items-center gap-1">
-                                        <i class="fa-solid fa-briefcase"></i> Ca Full-time (FT)
-                                    </div>
-                                    <div class="grid grid-cols-1 gap-1.5 pl-1">
-                                        <label class="flex items-center gap-2 cursor-pointer p-1.5 rounded-lg hover:bg-indigo-50/50 transition-all border border-transparent hover:border-indigo-100">
-                                            <input type="checkbox" value="FT1" class="emp-forbidden-chk w-3.5 h-3.5 accent-indigo-600 rounded">
-                                            <span class="font-bold text-indigo-900 min-w-[32px]">FT1</span>
-                                            <span class="text-slate-600">(6:30 - 15:00)</span>
-                                            <span class="ml-auto text-[9px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded font-bold">Full-time Sáng</span>
-                                        </label>
-                                        <label class="flex items-center gap-2 cursor-pointer p-1.5 rounded-lg hover:bg-indigo-50/50 transition-all border border-transparent hover:border-indigo-100">
-                                            <input type="checkbox" value="FT2" class="emp-forbidden-chk w-3.5 h-3.5 accent-indigo-600 rounded">
-                                            <span class="font-bold text-indigo-900 min-w-[32px]">FT2</span>
-                                            <span class="text-slate-600">(15:00 - 23:30)</span>
-                                            <span class="ml-auto text-[9px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded font-bold">Full-time Tối</span>
-                                        </label>
-                                    </div>
+                        <!-- BẢNG MA TRẬN FREE TIME -->
+                        <div class="space-y-2 pt-1">
+                            <div class="flex items-center justify-between">
+                                <label class="font-bold text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-table-cells text-indigo-600"></i> Bảng Lịch Rảnh / Bận Trực Quan:
+                                </label>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="setMatrixAll('free')" class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold hover:bg-emerald-200">Xanh tất cả</button>
+                                    <button onclick="setMatrixAll('normal')" class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold hover:bg-slate-200">Xóa hết</button>
                                 </div>
+                            </div>
 
-                                <hr class="border-slate-200 my-1">
-
-                                <div>
-                                    <div class="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 mb-1 flex items-center gap-1">
-                                        <i class="fa-solid fa-clock"></i> Ca Part-time (PT)
-                                    </div>
-                                    <div class="grid grid-cols-1 gap-1.5 pl-1">
-                                        <label class="flex items-center gap-2 cursor-pointer p-1.5 rounded-lg hover:bg-amber-50/50 transition-all border border-transparent hover:border-amber-100">
-                                            <input type="checkbox" value="PT1" class="emp-forbidden-chk w-3.5 h-3.5 accent-amber-600 rounded">
-                                            <span class="font-bold text-amber-900 min-w-[32px]">PT1</span>
-                                            <span class="text-slate-600">(6:30 - 12:00)</span>
-                                            <span class="ml-auto text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">Part-time Sáng</span>
-                                        </label>
-                                        <label class="flex items-center gap-2 cursor-pointer p-1.5 rounded-lg hover:bg-amber-50/50 transition-all border border-transparent hover:border-amber-100">
-                                            <input type="checkbox" value="PT2" class="emp-forbidden-chk w-3.5 h-3.5 accent-amber-600 rounded">
-                                            <span class="font-bold text-amber-900 min-w-[32px]">PT2</span>
-                                            <span class="text-slate-600">(09:00 - 15:00)</span>
-                                            <span class="ml-auto text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">Part-time Trưa</span>
-                                        </label>
-                                        <label class="flex items-center gap-2 cursor-pointer p-1.5 rounded-lg hover:bg-amber-50/50 transition-all border border-transparent hover:border-amber-100">
-                                            <input type="checkbox" value="PT3" class="emp-forbidden-chk w-3.5 h-3.5 accent-amber-600 rounded">
-                                            <span class="font-bold text-amber-900 min-w-[32px]">PT3</span>
-                                            <span class="text-slate-600">(12:00 - 17:00)</span>
-                                            <span class="ml-auto text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">Part-time Chiều</span>
-                                        </label>
-                                        <label class="flex items-center gap-2 cursor-pointer p-1.5 rounded-lg hover:bg-amber-50/50 transition-all border border-transparent hover:border-amber-100">
-                                            <input type="checkbox" value="PT4" class="emp-forbidden-chk w-3.5 h-3.5 accent-amber-600 rounded">
-                                            <span class="font-bold text-amber-900 min-w-[32px]">PT4</span>
-                                            <span class="text-slate-600">(17:00 - 23:30)</span>
-                                            <span class="ml-auto text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">Part-time Tối</span>
-                                        </label>
-                                    </div>
-                                </div>
+                            <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-inner">
+                                <table class="w-full text-[10px] text-center border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-800 text-white font-bold">
+                                            <th class="p-1 border border-slate-700 w-12">Ca</th>
+                                            <th class="p-1 border border-slate-700">T2</th>
+                                            <th class="p-1 border border-slate-700">T3</th>
+                                            <th class="p-1 border border-slate-700">T4</th>
+                                            <th class="p-1 border border-slate-700">T5</th>
+                                            <th class="p-1 border border-slate-700">T6</th>
+                                            <th class="p-1 border border-slate-700">T7</th>
+                                            <th class="p-1 border border-slate-700">CN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="matrixTableBody"></tbody>
+                                </table>
                             </div>
                         </div>
 
@@ -165,13 +163,13 @@
                     <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex justify-between items-center">
                         <span>Danh Sách Nhân Viên (<span id="empCount">0</span>)</span>
                     </h3>
-                    <div id="employeeList" class="space-y-2 max-h-[350px] overflow-y-auto pr-1"></div>
+                    <div id="employeeList" class="space-y-2 max-h-[300px] overflow-y-auto pr-1"></div>
                 </div>
 
             </div>
 
-            <!-- CỘT BÊN PHẢI: BẢNG LỊCH XẾP CA REALTIME -->
-            <div class="lg:col-span-8 space-y-6">
+            <!-- CỘT PHẢI: BẢNG LỊCH XẾP CA CHÍNH -->
+            <div class="lg:col-span-7 space-y-6">
                 
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-3">
@@ -187,7 +185,7 @@
                                 <i class="fa-solid fa-wand-magic-sparkles"></i> ⚡ Auto-Fill Ca Trống
                             </button>
                             <button onclick="copyToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow-sm transition-all flex items-center gap-1.5">
-                                <i class="fa-solid fa-file-excel"></i> 📋 Copy vào Excel (Hình 2)
+                                <i class="fa-solid fa-file-excel"></i> 📋 Copy vào Excel
                             </button>
                             <button onclick="resetSchedule()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs px-3 py-2.5 rounded-xl transition-all">
                                 Xóa Lịch
@@ -195,13 +193,13 @@
                         </div>
                     </div>
 
-                    <!-- BẢNG LỊCH -->
+                    <!-- BẢNG LỊCH XẾP CA -->
                     <div class="overflow-x-auto">
                         <table id="scheduleTable" class="w-full border-collapse text-xs text-center">
                             <thead>
                                 <tr class="bg-slate-900 text-white font-bold uppercase tracking-wider">
                                     <th class="p-3 border border-slate-700 w-12">Giờ</th>
-                                    <th class="p-3 border border-slate-700 w-36">CA LÀM VIỆC</th>
+                                    <th class="p-3 border border-slate-700 w-32">CA LÀM VIỆC</th>
                                     <th id="th_0" class="p-3 border border-slate-700">T2</th>
                                     <th id="th_1" class="p-3 border border-slate-700">T3</th>
                                     <th id="th_2" class="p-3 border border-slate-700">T4</th>
@@ -219,7 +217,7 @@
                 <!-- THỐNG KÊ PHÂN BỔ CA -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
                     <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Thống kê phân bổ số ca:</h3>
-                    <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3"></div>
+                    <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
                 </div>
 
             </div>
@@ -229,7 +227,6 @@
     </div>
 
     <script>
-        // SẮP XẾP SHIFTS THEO ĐÚNG THỨ TỰ VÀ BỔ SUNG SỐ GIỜ LÀM (HOURS)
         const SHIFTS = [
             { id: "PT1", name: "PT1 (Part-time 1)", time: "6:30 - 12:00", hours: "5.5", type: "Part-time" },
             { id: "FT1", name: "FT1 (Full-time 1)", time: "6:30 - 15:00", hours: "8.5", type: "Full-time" },
@@ -242,7 +239,6 @@
         const DAY_NAMES = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
         const DAY_NAMES_FULL = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật"];
 
-        // BẢNG MÀU HEX CHO EXCEL GIỐNG HỆT GIAO DIỆN HÌNH 2
         const EMP_COLORS_EXCEL = {
             "PHÚC":  { bg: "#dbeafe", color: "#1e40af" },
             "LINH":  { bg: "#fce7f3", color: "#9d174d" },
@@ -255,19 +251,31 @@
             "DEFAULT": { bg: "#f1f5f9", color: "#334155" }
         };
 
+        let currentMatrixState = {};
+
         let employees = [
-            { name: "HIN", level: "Giỏi", maxShifts: 7, avail: "T2-CN: cả ngày", forbidden: [] },
-            { name: "LINH", level: "Giỏi", maxShifts: 5, avail: "T2-T6: 6:30-15:00", forbidden: ["FT2", "PT4"] },
-            { name: "PHÚC", level: "Giỏi", maxShifts: 5, avail: "T2, T5, CN cả ngày; T7: 17h-23h", forbidden: [] },
-            { name: "VY", level: "Trung bình", maxShifts: 6, avail: "Cả tuần", forbidden: [] },
-            { name: "DUY", level: "Giỏi", maxShifts: 5, avail: "T2 cả ngày; T4, T6: 15h-23h30", forbidden: [] },
-            { name: "NHUNG", level: "Trung bình", maxShifts: 5, avail: "Cả tuần", forbidden: [] },
-            { name: "HƯƠNG", level: "Trung bình", maxShifts: 5, avail: "T3, T5, T6, T7, CN: sáng/chiều", forbidden: ["FT2", "PT4"] },
-            { name: "NOI", level: "Giỏi", maxShifts: 3, avail: "T2-T6 : 9h-17h", forbidden: ["PT4"] }
+            { name: "HIN", level: "Giỏi", maxShifts: 7, matrix: createDefaultMatrix('free') },
+            { name: "LINH", level: "Giỏi", maxShifts: 5, matrix: createDefaultMatrix('free') },
+            { name: "PHÚC", level: "Giỏi", maxShifts: 5, matrix: createDefaultMatrix('free') },
+            { name: "VY", level: "Trung bình", maxShifts: 6, matrix: createDefaultMatrix('free') },
+            { name: "DUY", level: "Giỏi", maxShifts: 5, matrix: createDefaultMatrix('free') },
+            { name: "NHUNG", level: "Trung bình", maxShifts: 5, matrix: createDefaultMatrix('free') },
+            { name: "HƯƠNG", level: "Trung bình", maxShifts: 5, matrix: createDefaultMatrix('free') },
+            { name: "NOI", level: "Giỏi", maxShifts: 3, matrix: createDefaultMatrix('free') }
         ];
 
         let scheduleState = {};
         let editingIndex = -1;
+
+        function createDefaultMatrix(defaultValue = 'normal') {
+            let m = {};
+            SHIFTS.forEach(s => {
+                DAY_NAMES.forEach((_, dIdx) => {
+                    m[`${s.id}_${dIdx}`] = defaultValue;
+                });
+            });
+            return m;
+        }
 
         window.onload = function() {
             const today = new Date();
@@ -283,26 +291,130 @@
             });
 
             updateTableHeaderDates();
+            renderMatrixForm();
             renderEmployeeList();
             initScheduleTable();
             updateStats();
         };
 
+        /* -------------------------------------------------------------
+         * HÀM PHÂN TÍCH VĂN BẢN ĐÃ ĐƯỢC TỐI ƯU VÀ FIX LỖI
+         * ------------------------------------------------------------- */
+        function parseFreeTextToMatrix() {
+            const rawPrompt = document.getElementById("freeTextPrompt").value.toLowerCase().trim();
+            if (!rawPrompt) { alert("Vui lòng nhập văn bản mô tả lịch rảnh!"); return; }
+
+            // 1. Reset ma trận về 'normal' (bình thường/trống)
+            currentMatrixState = createDefaultMatrix('normal');
+
+            // 2. Tách câu dựa trên dấu phẩy hoặc từ 'và'
+            // Sử dụng Regex chuẩn để cắt câu thông minh hơn
+            const segments = rawPrompt.split(/,|\s+và\s+/);
+
+            segments.forEach(segment => {
+                segment = segment.trim();
+                if (!segment) return;
+
+                // Xác định ngày trong segment này
+                let targetDays = [];
+                if (segment.includes("t2") || segment.includes("thứ 2") || segment.includes("thứ hai")) targetDays.push(0);
+                if (segment.includes("t3") || segment.includes("thứ 3") || segment.includes("thứ ba")) targetDays.push(1);
+                if (segment.includes("t4") || segment.includes("thứ 4") || segment.includes("thứ tư")) targetDays.push(2);
+                if (segment.includes("t5") || segment.includes("thứ 5") || segment.includes("thứ năm")) targetDays.push(3);
+                if (segment.includes("t6") || segment.includes("thứ 6") || segment.includes("thứ sáu")) targetDays.push(4);
+                if (segment.includes("t7") || segment.includes("thứ 7") || segment.includes("thứ bảy")) targetDays.push(5);
+                if (segment.includes("cn") || segment.includes("chủ nhật")) targetDays.push(6);
+
+                if (targetDays.length === 0) return;
+
+                // Xác định khung ca dựa theo giờ hoặc từ khóa trong segment
+                let targetShifts = [];
+
+                if (segment.includes("12-17") || segment.includes("12h-17h") || segment.includes("12:00-17:00")) {
+                    targetShifts.push("PT3");
+                } else if (segment.includes("6:30-12") || segment.includes("sáng")) {
+                    targetShifts.push("PT1", "FT1");
+                } else if (segment.includes("chiều") || segment.includes("9h-15h") || segment.includes("9-15")) {
+                    targetShifts.push("PT2", "PT3");
+                } else if (segment.includes("tối") || segment.includes("17-23") || segment.includes("17h-23h")) {
+                    targetShifts.push("FT2", "PT4");
+                } else {
+                    // Mặc định nếu không nói rõ giờ (VD: "t2, t5 cả ngày" hoặc chỉ gõ "t2, t5") -> Rảnh tất cả ca
+                    targetShifts = SHIFTS.map(s => s.id);
+                }
+
+                // Gán trạng thái 'free' vào ma trận
+                targetDays.forEach(dIdx => {
+                    targetShifts.forEach(sId => {
+                        currentMatrixState[`${sId}_${dIdx}`] = 'free';
+                    });
+                });
+            });
+
+            // 3. Re-render lại giao diện bảng ma trận
+            renderMatrixForm();
+            alert("✨ Đã cập nhật thành công lịch rảnh từ văn bản vào ma trận!");
+        }
+
+        function renderMatrixForm() {
+            const tbody = document.getElementById("matrixTableBody");
+            tbody.innerHTML = "";
+
+            SHIFTS.forEach(shift => {
+                let row = `<tr class="border-b border-slate-100"><td class="p-1 font-bold bg-slate-100 text-slate-700 border border-slate-200">${shift.id}</td>`;
+                
+                DAY_NAMES.forEach((_, dayIdx) => {
+                    const key = `${shift.id}_${dayIdx}`;
+                    const state = currentMatrixState[key] || 'normal';
+                    let text = '—';
+                    if (state === 'free') text = 'FREE';
+                    if (state === 'busy') text = 'BUSY';
+
+                    row += `
+                        <td onclick="toggleMatrixCell('${key}')" class="p-2 border border-slate-200 matrix-cell ${state}" id="mc_${key}">
+                            ${text}
+                        </td>
+                    `;
+                });
+
+                row += `</tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function toggleMatrixCell(key) {
+            const currentState = currentMatrixState[key] || 'normal';
+            let nextState = 'free';
+            if (currentState === 'free') nextState = 'busy';
+            else if (currentState === 'busy') nextState = 'normal';
+
+            currentMatrixState[key] = nextState;
+            
+            const cell = document.getElementById(`mc_${key}`);
+            cell.className = `p-2 border border-slate-200 matrix-cell ${nextState}`;
+            cell.innerText = nextState === 'free' ? 'FREE' : (nextState === 'busy' ? 'BUSY' : '—');
+        }
+
+        function setMatrixAll(state) {
+            SHIFTS.forEach(s => {
+                DAY_NAMES.forEach((_, dIdx) => {
+                    currentMatrixState[`${s.id}_${dIdx}`] = state;
+                });
+            });
+            renderMatrixForm();
+        }
+
         function updateTableHeaderDates() {
             const startDateVal = document.getElementById("startDateInput").value;
             if (!startDateVal) return;
-
             const startMon = new Date(startDateVal);
 
             DAY_NAMES.forEach((dayName, idx) => {
                 const currentDay = new Date(startMon);
                 currentDay.setDate(startMon.getDate() + idx);
-
                 const dateStr = `${currentDay.getDate()}/${currentDay.getMonth() + 1}`;
                 const thEl = document.getElementById(`th_${idx}`);
-                if (thEl) {
-                    thEl.innerHTML = `${dayName}<br><span class="text-[10px] font-normal opacity-80">${dateStr}</span>`;
-                }
+                if (thEl) thEl.innerHTML = `${dayName}<br><span class="text-[10px] font-normal opacity-80">${dateStr}</span>`;
             });
         }
 
@@ -318,7 +430,9 @@
 
             employees.forEach((emp, idx) => {
                 const badgeLevel = emp.level === 'Giỏi' ? 'bg-emerald-100 text-emerald-700' : (emp.level === 'Trung bình' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700');
-                const forbiddenText = emp.forbidden.length > 0 ? `Cấm: ${emp.forbidden.join(', ')}` : 'Không cấm ca';
+
+                let freeCount = 0;
+                Object.values(emp.matrix || {}).forEach(v => { if (v === 'free') freeCount++; });
 
                 listEl.innerHTML += `
                     <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
@@ -326,10 +440,9 @@
                             <div class="flex items-center gap-1.5">
                                 <span class="font-bold text-slate-800">${emp.name}</span>
                                 <span class="px-2 py-0.5 rounded-md font-semibold text-[10px] ${badgeLevel}">${emp.level}</span>
-                                <span class="text-slate-500 text-[10px]">(Max: ${emp.maxShifts} ca)</span>
+                                <span class="text-slate-500 text-[10px]">(Max: ${emp.maxShifts} ca/tuần)</span>
                             </div>
-                            <div class="text-[10px] text-slate-500">${emp.avail || 'Không ghi'}</div>
-                            <div class="text-[10px] text-rose-500 font-semibold">${forbiddenText}</div>
+                            <div class="text-[10px] text-emerald-700 font-semibold">🟢 Có ${freeCount} khung ca rảnh (Free Time)</div>
                         </div>
                         <div class="flex items-center gap-1">
                             <button onclick="editEmployee(${idx})" title="Sửa thông tin" class="text-slate-500 hover:text-indigo-600 p-1.5 rounded-lg hover:bg-slate-200 transition-all">
@@ -351,11 +464,9 @@
             document.getElementById("empName").value = emp.name;
             document.getElementById("empLevel").value = emp.level;
             document.getElementById("empMaxShifts").value = emp.maxShifts;
-            document.getElementById("empAvail").value = emp.avail || "";
 
-            document.querySelectorAll(".emp-forbidden-chk").forEach(chk => {
-                chk.checked = emp.forbidden.includes(chk.value);
-            });
+            currentMatrixState = JSON.parse(JSON.stringify(emp.matrix || createDefaultMatrix()));
+            renderMatrixForm();
 
             document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-user-pen text-indigo-600"></i> Chỉnh Sửa: ${emp.name}`;
             document.getElementById("saveEmpBtn").innerText = "✓ Cập Nhật Thông Tin Nhân Viên";
@@ -368,10 +479,12 @@
             document.getElementById("empName").value = "";
             document.getElementById("empLevel").value = "Trung bình";
             document.getElementById("empMaxShifts").value = "5";
-            document.getElementById("empAvail").value = "";
-            document.querySelectorAll(".emp-forbidden-chk").forEach(chk => chk.checked = false);
+            document.getElementById("freeTextPrompt").value = "";
 
-            document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-user-plus text-indigo-600"></i> Nhập Thông Tin Nhân Viên`;
+            currentMatrixState = {};
+            renderMatrixForm();
+
+            document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-user-plus text-indigo-600"></i> Nhập Thông Tin & Đăng Ký Ca`;
             document.getElementById("saveEmpBtn").innerText = "+ Thêm Nhân Viên Vào Danh Sách";
             document.getElementById("saveEmpBtn").className = "w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm";
             document.getElementById("cancelEditBtn").classList.add("hidden");
@@ -382,27 +495,21 @@
             const name = nameInput.value.trim().toUpperCase();
             const level = document.getElementById("empLevel").value;
             const maxShifts = parseInt(document.getElementById("empMaxShifts").value);
-            const avail = document.getElementById("empAvail").value.trim();
 
             if (!name) { alert("Vui lòng nhập tên nhân viên!"); return; }
 
-            const forbidden = [];
-            document.querySelectorAll(".emp-forbidden-chk:checked").forEach(chk => {
-                forbidden.push(chk.value);
-            });
+            const matrixCopy = JSON.parse(JSON.stringify(currentMatrixState));
 
             if (editingIndex === -1) {
                 if (employees.some(e => e.name === name)) { alert("Tên nhân viên đã tồn tại!"); return; }
-                employees.push({ name, level, maxShifts, avail, forbidden });
+                employees.push({ name, level, maxShifts, matrix: matrixCopy });
             } else {
                 const oldName = employees[editingIndex].name;
-                employees[editingIndex] = { name, level, maxShifts, avail, forbidden };
+                employees[editingIndex] = { name, level, maxShifts, matrix: matrixCopy };
 
                 if (oldName !== name) {
                     for (let key in scheduleState) {
-                        if (scheduleState[key].emp === oldName) {
-                            scheduleState[key].emp = name;
-                        }
+                        if (scheduleState[key].emp === oldName) scheduleState[key].emp = name;
                     }
                 }
             }
@@ -417,9 +524,7 @@
             const empName = employees[idx].name;
             if (confirm(`Bạn có chắc muốn xóa nhân viên ${empName}?`)) {
                 for (let key in scheduleState) {
-                    if (scheduleState[key].emp === empName) {
-                        delete scheduleState[key];
-                    }
+                    if (scheduleState[key].emp === empName) delete scheduleState[key];
                 }
                 employees.splice(idx, 1);
                 if (editingIndex === idx) cancelEdit();
@@ -446,12 +551,10 @@
 
                 DAY_NAMES.forEach((day, dayIdx) => {
                     const key = `${shift.id}_${dayIdx}`;
-                    
-                    // KIỂM TRA ĐIỀU KIỆN KHÓA CA PT2 VÀO T7 VÀ CN (dayIdx === 5 || dayIdx === 6)
                     const isDisabledShift = (shift.id === "PT2" && (dayIdx === 5 || dayIdx === 6));
 
                     if (isDisabledShift) {
-                        delete scheduleState[key]; // Xóa khỏi bộ nhớ nếu có
+                        delete scheduleState[key];
                         rowHtml += `
                             <td class="p-1.5 border border-slate-200">
                                 <div class="w-full py-2 px-1 text-center font-bold text-[11px] rounded-xl border emp-color-DISABLED">
@@ -488,11 +591,8 @@
         }
 
         function onManualCellChange(key, value) {
-            if (value === "") {
-                delete scheduleState[key];
-            } else {
-                scheduleState[key] = { emp: value, isFixed: true };
-            }
+            if (value === "") delete scheduleState[key];
+            else scheduleState[key] = { emp: value, isFixed: true };
             initScheduleTable();
         }
 
@@ -524,17 +624,14 @@
                 });
 
                 SHIFTS.forEach(shift => {
-                    // Bỏ qua không xếp tự động ca PT2 vào T7 & CN
                     if (shift.id === "PT2" && (dayIdx === 5 || dayIdx === 6)) return;
-
                     const key = `${shift.id}_${dayIdx}`;
 
-                    if (scheduleState[key] && scheduleState[key].emp) {
-                        return;
-                    }
+                    if (scheduleState[key] && scheduleState[key].emp) return;
 
                     let candidates = employees.filter(e => {
-                        if (e.forbidden.includes(shift.id)) return false;
+                        const cellState = (e.matrix || {})[key];
+                        if (cellState !== 'free') return false;
                         if (workedToday.has(e.name)) return false;
                         if (enforceMaxShifts && counts[e.name] >= e.maxShifts) return false;
 
@@ -559,7 +656,6 @@
             });
         }
 
-        // TẠO HTML BẢNG RICH-TEXT COPY VÀO EXCEL Y HỆT HÌNH 2
         function copyToExcel() {
             const startDateVal = document.getElementById("startDateInput").value;
             const startMon = startDateVal ? new Date(startDateVal) : new Date();
@@ -571,12 +667,9 @@
                 return `${d}-${m}-${y}`;
             }
 
-            // TẠO HTML TABLE ĐỂ EXCEL BẢO TỒN ĐỊNH DẠNG MÀU SẮC
             let htmlTable = `<table border="1" style="border-collapse: collapse; font-family: Arial, sans-serif; text-align: center; font-size: 11pt;">`;
-            
-            // DÒNG TIÊU ĐỀ HÀNG ĐẦU (DARK TEAL LIKE IMAGE 2)
             htmlTable += `<tr style="background-color: #0f3843; color: #ffffff; font-weight: bold; height: 35px;">`;
-            htmlTable += `<th style="width: 50px;"></th>`; // Ô trống góc trên
+            htmlTable += `<th style="width: 50px;"></th>`;
             htmlTable += `<th style="width: 150px; background-color: #0f3843; color: #ffffff;">CA LÀM VIỆC</th>`;
             
             DAY_NAMES_FULL.forEach((dName, i) => {
@@ -586,26 +679,18 @@
             });
             htmlTable += `</tr>`;
 
-            // CÁC DÒNG CA LÀM VIỆC
             SHIFTS.forEach(shift => {
                 htmlTable += `<tr style="height: 32px;">`;
-                
-                // Cột 1: Số giờ
                 htmlTable += `<td style="background-color: #f1f5f9; color: #64748b; font-weight: bold;">${shift.hours}</td>`;
-                
-                // Cột 2: Thời gian ca
                 htmlTable += `<td style="background-color: #0f3843; color: #ffffff; font-weight: bold; text-align: center;">${shift.time}</td>`;
 
-                // Cột 3 -> 9: Các ngày trong tuần
                 DAY_NAMES.forEach((_, dayIdx) => {
                     const isDisabledShift = (shift.id === "PT2" && (dayIdx === 5 || dayIdx === 6));
-                    
                     if (isDisabledShift) {
                         htmlTable += `<td style="background-color: #ffffff; color: #ffffff;"></td>`;
                     } else {
                         const key = `${shift.id}_${dayIdx}`;
                         const empName = (scheduleState[key] && scheduleState[key].emp) ? scheduleState[key].emp : "";
-                        
                         let colorConfig = EMP_COLORS_EXCEL[empName] || { bg: "#ffffff", color: "#000000" };
                         if (!empName) colorConfig = { bg: "#ffffff", color: "#cccccc" };
 
@@ -618,27 +703,16 @@
 
             htmlTable += `</table>`;
 
-            // COPY RICH TEXT HTML VÀO CLIPBOARD (CHO EXCEL NHẬN MÀU & ĐỊNH DẠNG)
             const blobHtml = new Blob([htmlTable], { type: 'text/html' });
             const blobText = new Blob([htmlTable.replace(/<[^>]+>/g, '')], { type: 'text/plain' });
 
-            const data = [new ClipboardItem({
-                'text/html': blobHtml,
-                'text/plain': blobText
-            })];
-
-            navigator.clipboard.write(data).then(() => {
-                alert("📋 Đã sao chép bảng lịch chuẩn định dạng Hình 2!\n\nBạn hãy mở Excel hoặc Google Sheets và nhấn Ctrl + V để dán giữ nguyên màu sắc.");
-            }).catch(err => {
-                // Fallback nếu trình duyệt cũ
-                navigator.clipboard.writeText(htmlTable).then(() => {
-                    alert("📋 Đã sao chép dữ liệu!");
-                });
+            navigator.clipboard.write([new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })]).then(() => {
+                alert("📋 Đã sao chép bảng lịch! Bạn hãy mở Excel và dán (Ctrl + V).");
             });
         }
 
         function resetSchedule() {
-            if (confirm("Bạn có chắc muốn xóa tất cả lịch hiện tại?")) {
+            if (confirm("Jạn có chắc muốn xóa tất cả lịch hiện tại?")) {
                 scheduleState = {};
                 initScheduleTable();
             }
@@ -650,9 +724,7 @@
 
             for (let key in scheduleState) {
                 let item = scheduleState[key];
-                if (item && item.emp && counts[item.emp] !== undefined) {
-                    counts[item.emp]++;
-                }
+                if (item && item.emp && counts[item.emp] !== undefined) counts[item.emp]++;
             }
 
             const statsGrid = document.getElementById("statsGrid");
