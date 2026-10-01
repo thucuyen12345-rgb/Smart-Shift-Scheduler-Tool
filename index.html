@@ -68,131 +68,25 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- CỘT TRÁI: FORM & MA TRẬN -->
-            <div class="lg:col-span-5 space-y-6">
+            <!-- CỘT TRÁI: DANH SÁCH NHÂN VIÊN & NÚT THÊM -->
+            <div class="lg:col-span-4 space-y-6">
                 
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                        <h2 id="formTitle" class="text-md font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-user-plus text-indigo-600"></i> Nhập Thông Tin & Đăng Ký Ca
-                        </h2>
-                        <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden text-xs text-rose-600 font-bold hover:underline">
-                            Hủy chỉnh sửa
+                        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            Danh Sách Nhân Viên (<span id="empCount">0</span>)
+                        </h3>
+                        <button onclick="openAddModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-sm transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-user-plus"></i> Thêm Nhân Viên
                         </button>
                     </div>
-
-                    <div class="space-y-3 text-xs">
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="col-span-1">
-                                <label class="font-bold text-slate-700">Tên Nhân Viên:</label>
-                                <input type="text" id="empName" placeholder="VD: HIN..." class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 uppercase font-semibold">
-                            </div>
-                            <div>
-                                <label class="font-bold text-slate-700">Khả năng:</label>
-                                <select id="empLevel" class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 font-medium">
-                                    <option value="Giỏi">Giỏi</option>
-                                    <option value="Trung bình" selected>Trung bình</option>
-                                    <option value="Yếu">Yếu</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="font-bold text-slate-700">Max ca/tuần:</label>
-                                <input type="number" id="empMaxShifts" value="5" min="1" max="14" class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 font-semibold">
-                            </div>
-                        </div>
-
-                        <!-- 💡 KHU VỰC CHỌN CẤM CA THEO CA LÀM VIỆC (MỌI NGÀY) -->
-                        <div class="bg-rose-50/70 p-3 rounded-xl border border-rose-100 space-y-2">
-                            <label class="font-bold text-rose-950 flex items-center gap-1.5 text-[11px]">
-                                <i class="fa-solid fa-ban text-rose-600"></i> Cấm ca (không được xếp ca này, mọi ngày):
-                            </label>
-                            <div class="grid grid-cols-3 gap-2 pt-1">
-                                <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
-                                    <input type="checkbox" name="quickBusyShift" value="PT1" class="accent-rose-600 w-3.5 h-3.5"> PT1 <span class="text-[10px] text-slate-400 font-normal">6:30-12</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
-                                    <input type="checkbox" name="quickBusyShift" value="FT1" class="accent-rose-600 w-3.5 h-3.5"> FT1 <span class="text-[10px] text-slate-400 font-normal">6:30-15</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
-                                    <input type="checkbox" name="quickBusyShift" value="PT2" class="accent-rose-600 w-3.5 h-3.5"> PT2 <span class="text-[10px] text-slate-400 font-normal">9-15</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
-                                    <input type="checkbox" name="quickBusyShift" value="PT3" class="accent-rose-600 w-3.5 h-3.5"> PT3 <span class="text-[10px] text-slate-400 font-normal">12-17</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
-                                    <input type="checkbox" name="quickBusyShift" value="FT2" class="accent-rose-600 w-3.5 h-3.5"> FT2 <span class="text-[10px] text-slate-400 font-normal">15-23:30</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
-                                    <input type="checkbox" name="quickBusyShift" value="PT4" class="accent-rose-600 w-3.5 h-3.5"> PT4 <span class="text-[10px] text-slate-400 font-normal">17-23:30</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- 💡 KHU VỰC NHẬP VĂN BẢN -->
-                        <div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-100 space-y-2">
-                            <label class="font-bold text-indigo-950 flex items-center gap-1.5 text-[11px]">
-                                <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i> Nhập lịch rảnh dạng văn bản tự do:
-                            </label>
-                            <div class="flex gap-2">
-                                <input type="text" id="freeTextPrompt" placeholder="VD: rảnh t2, t5 cả ngày và cn 12-17h" class="w-full p-2 text-xs border border-indigo-200 rounded-lg outline-none focus:border-indigo-600 bg-white">
-                                <button onclick="parseFreeTextToMatrix()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg shrink-0 transition-all text-xs">
-                                    Tạo Matrix
-                                </button>
-                            </div>
-                            <div class="text-[10px] text-slate-500 italic">
-                                *Mặc định toàn bộ là FREE, các ca không được nhắc đến sẽ chuyển thành **BUSY**.
-                            </div>
-                        </div>
-
-                        <!-- BẢNG MA TRẬN FREE/BUSY TIME -->
-                        <div class="space-y-2 pt-1">
-                            <div class="flex items-center justify-between">
-                                <label class="font-bold text-slate-800 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-table-cells text-indigo-600"></i> Bảng Lịch Rảnh / Cấm Ca (Busy):
-                                </label>
-                                <div class="flex items-center gap-2">
-                                    <button onclick="setMatrixAll('free')" class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold hover:bg-emerald-200">Rảnh tất cả</button>
-                                    <button onclick="setMatrixAll('busy')" class="text-[10px] bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-bold hover:bg-rose-200">Cấm tất cả</button>
-                                </div>
-                            </div>
-
-                            <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-inner">
-                                <table class="w-full text-[10px] text-center border-collapse">
-                                    <thead>
-                                        <tr class="bg-slate-800 text-white font-bold">
-                                            <th class="p-1 border border-slate-700 w-12">Ca</th>
-                                            <th class="p-1 border border-slate-700">T2</th>
-                                            <th class="p-1 border border-slate-700">T3</th>
-                                            <th class="p-1 border border-slate-700">T4</th>
-                                            <th class="p-1 border border-slate-700">T5</th>
-                                            <th class="p-1 border border-slate-700">T6</th>
-                                            <th class="p-1 border border-slate-700">T7</th>
-                                            <th class="p-1 border border-slate-700">CN</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="matrixTableBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <button id="saveEmpBtn" onclick="saveEmployee()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm">
-                            + Thêm Nhân Viên Vào Danh Sách
-                        </button>
-                    </div>
-                </div>
-
-                <!-- DANH SÁCH NHÂN VIÊN -->
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex justify-between items-center">
-                        <span>Danh Sách Nhân Viên (<span id="empCount">0</span>)</span>
-                    </h3>
-                    <div id="employeeList" class="space-y-2 max-h-[300px] overflow-y-auto pr-1"></div>
+                    <div id="employeeList" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
                 </div>
 
             </div>
 
             <!-- CỘT PHẢI: BẢNG LỊCH XẾP CA CHÍNH -->
-            <div class="lg:col-span-7 space-y-6">
+            <div class="lg:col-span-8 space-y-6">
                 
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-3">
@@ -249,6 +143,126 @@
 
     </div>
 
+    <!-- POPUP MODAL THÊM / SỬA NHÂN VIÊN -->
+    <div id="empModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 id="modalTitle" class="text-md font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-indigo-600"></i> Thêm Nhân Viên Mới
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-4 overflow-y-auto text-xs flex-1">
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="col-span-1">
+                        <label class="font-bold text-slate-700">Tên Nhân Viên:</label>
+                        <input type="text" id="empName" placeholder="VD: HIN..." class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 uppercase font-semibold">
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-700">Khả năng:</label>
+                        <select id="empLevel" class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 font-medium">
+                            <option value="Giỏi">Giỏi</option>
+                            <option value="Trung bình" selected>Trung bình</option>
+                            <option value="Yếu">Yếu</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-700">Max ca/tuần:</label>
+                        <input type="number" id="empMaxShifts" value="5" min="1" max="14" class="w-full mt-1 p-2 border border-slate-300 rounded-xl outline-none focus:border-indigo-600 font-semibold">
+                    </div>
+                </div>
+
+                <!-- Cấm ca theo ca làm việc -->
+                <div class="bg-rose-50/70 p-3 rounded-xl border border-rose-100 space-y-2">
+                    <label class="font-bold text-rose-950 flex items-center gap-1.5 text-[11px]">
+                        <i class="fa-solid fa-ban text-rose-600"></i> Cấm ca (không được xếp ca này, mọi ngày):
+                    </label>
+                    <div class="grid grid-cols-3 gap-2 pt-1">
+                        <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
+                            <input type="checkbox" name="quickBusyShift" value="PT1" class="accent-rose-600 w-3.5 h-3.5"> PT1 <span class="text-[10px] text-slate-400 font-normal">6:30-12</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
+                            <input type="checkbox" name="quickBusyShift" value="FT1" class="accent-rose-600 w-3.5 h-3.5"> FT1 <span class="text-[10px] text-slate-400 font-normal">6:30-15</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
+                            <input type="checkbox" name="quickBusyShift" value="PT2" class="accent-rose-600 w-3.5 h-3.5"> PT2 <span class="text-[10px] text-slate-400 font-normal">9-15</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
+                            <input type="checkbox" name="quickBusyShift" value="PT3" class="accent-rose-600 w-3.5 h-3.5"> PT3 <span class="text-[10px] text-slate-400 font-normal">12-17</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
+                            <input type="checkbox" name="quickBusyShift" value="FT2" class="accent-rose-600 w-3.5 h-3.5"> FT2 <span class="text-[10px] text-slate-400 font-normal">15-23:30</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-rose-200 cursor-pointer hover:bg-rose-50 font-semibold text-slate-700">
+                            <input type="checkbox" name="quickBusyShift" value="PT4" class="accent-rose-600 w-3.5 h-3.5"> PT4 <span class="text-[10px] text-slate-400 font-normal">17-23:30</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Nhập văn bản tự do -->
+                <div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-100 space-y-2">
+                    <label class="font-bold text-indigo-950 flex items-center gap-1.5 text-[11px]">
+                        <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i> Nhập lịch rảnh dạng văn bản tự do:
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" id="freeTextPrompt" placeholder="VD: rảnh t2, t5 cả ngày và cn 12-17h" class="w-full p-2 text-xs border border-indigo-200 rounded-lg outline-none focus:border-indigo-600 bg-white">
+                        <button onclick="parseFreeTextToMatrix()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg shrink-0 transition-all text-xs">
+                            Tạo Matrix
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bảng Ma Trận Free/Busy -->
+                <div class="space-y-2 pt-1">
+                    <div class="flex items-center justify-between">
+                        <label class="font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-table-cells text-indigo-600"></i> Bảng Lịch Rảnh / Cấm Ca (Busy):
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <button onclick="setMatrixAll('free')" class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold hover:bg-emerald-200">Rảnh tất cả</button>
+                            <button onclick="setMatrixAll('busy')" class="text-[10px] bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-bold hover:bg-rose-200">Cấm tất cả</button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-inner">
+                        <table class="w-full text-[10px] text-center border-collapse">
+                            <thead>
+                                <tr class="bg-slate-800 text-white font-bold">
+                                    <th class="p-1 border border-slate-700 w-12">Ca</th>
+                                    <th class="p-1 border border-slate-700">T2</th>
+                                    <th class="p-1 border border-slate-700">T3</th>
+                                    <th class="p-1 border border-slate-700">T4</th>
+                                    <th class="p-1 border border-slate-700">T5</th>
+                                    <th class="p-1 border border-slate-700">T6</th>
+                                    <th class="p-1 border border-slate-700">T7</th>
+                                    <th class="p-1 border border-slate-700">CN</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matrixTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex justify-end gap-2">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition-all">
+                    Hủy
+                </button>
+                <button id="saveEmpBtn" onclick="saveEmployee()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all shadow-sm">
+                    Lưu Nhân Viên
+                </button>
+            </div>
+
+        </div>
+    </div>
+
     <script>
         const SHIFTS = [
             { id: "PT1", name: "PT1 (Part-time 1)", time: "6:30 - 12:00", hours: "5.5", type: "Part-time" },
@@ -275,7 +289,6 @@
         };
 
         let currentMatrixState = {};
-
         let employees = [
             { name: "HIN", level: "Giỏi", maxShifts: 7, matrix: createDefaultMatrix('free') },
             { name: "LINH", level: "Giỏi", maxShifts: 5, matrix: createDefaultMatrix('free') },
@@ -290,7 +303,6 @@
         let scheduleState = {};
         let editingIndex = -1;
 
-        // Mặc định toàn bộ là 'free' (Full ca)
         function createDefaultMatrix(defaultValue = 'free') {
             let m = {};
             SHIFTS.forEach(s => {
@@ -314,30 +326,68 @@
                 scheduleState[`FT1_${idx}`] = { emp: "HIN", isFixed: true };
             });
 
-            currentMatrixState = createDefaultMatrix('free');
             updateTableHeaderDates();
-            renderMatrixForm();
             renderEmployeeList();
             initScheduleTable();
             updateStats();
         };
 
         /* -------------------------------------------------------------
-         * HÀM PHÂN TÍCH VĂN BẢN VÀ CHECKBOX CẤM CA (Chỉ Free / Busy)
+         * MODAL CONTROLS
+         * ------------------------------------------------------------- */
+        function openAddModal() {
+            editingIndex = -1;
+            document.getElementById("empName").value = "";
+            document.getElementById("empLevel").value = "Trung bình";
+            document.getElementById("empMaxShifts").value = "5";
+            document.getElementById("freeTextPrompt").value = "";
+            document.querySelectorAll('input[name="quickBusyShift"]').forEach(cb => cb.checked = false);
+
+            currentMatrixState = createDefaultMatrix('free');
+            renderMatrixForm();
+
+            document.getElementById("modalTitle").innerHTML = `<i class="fa-solid fa-user-plus text-indigo-600"></i> Thêm Nhân Viên Mới`;
+            document.getElementById("saveEmpBtn").innerText = "Thêm Nhân Viên";
+            document.getElementById("empModal").classList.remove("hidden");
+            document.getElementById("empModal").classList.add("flex");
+        }
+
+        function editEmployee(idx) {
+            editingIndex = idx;
+            const emp = employees[idx];
+
+            document.getElementById("empName").value = emp.name;
+            document.getElementById("empLevel").value = emp.level;
+            document.getElementById("empMaxShifts").value = emp.maxShifts;
+            document.getElementById("freeTextPrompt").value = "";
+            document.querySelectorAll('input[name="quickBusyShift"]').forEach(cb => cb.checked = false);
+
+            currentMatrixState = JSON.parse(JSON.stringify(emp.matrix || createDefaultMatrix('free')));
+            renderMatrixForm();
+
+            document.getElementById("modalTitle").innerHTML = `<i class="fa-solid fa-user-pen text-indigo-600"></i> Chỉnh Sửa: ${emp.name}`;
+            document.getElementById("saveEmpBtn").innerText = "Cập Nhật";
+            document.getElementById("empModal").classList.remove("hidden");
+            document.getElementById("empModal").classList.add("flex");
+        }
+
+        function closeModal() {
+            document.getElementById("empModal").classList.remove("flex");
+            document.getElementById("empModal").classList.add("hidden");
+        }
+
+        /* -------------------------------------------------------------
+         * PHÂN TÍCH VĂN BẢN VÀ CHECKBOX CẤM CA
          * ------------------------------------------------------------- */
         function parseFreeTextToMatrix() {
             const rawPrompt = document.getElementById("freeTextPrompt").value.toLowerCase().trim();
-
-            // 1. Mặc định ban đầu toàn bộ là 'busy' khi người dùng muốn phân tích lịch rảnh tự do
             currentMatrixState = createDefaultMatrix('busy');
 
-            // 2. Lấy danh sách các ca bị cấm nhanh bằng checkbox
             let checkedBusyShifts = [];
             document.querySelectorAll('input[name="quickBusyShift"]:checked').forEach(cb => {
                 checkedBusyShifts.push(cb.value);
             });
 
-            // 3. Phân tích văn bản tự do để gán 'free' cho những ngày/ca được nhắc tới
             if (rawPrompt) {
                 const segments = rawPrompt.split(/,|\s+và\s+/);
 
@@ -378,7 +428,6 @@
                     });
                 });
             } else {
-                // Nếu không nhập văn bản, mặc định là free trừ các ca bị tích cấm nhanh
                 SHIFTS.forEach(s => {
                     DAY_NAMES.forEach((_, dIdx) => {
                         if (!checkedBusyShifts.includes(s.id)) {
@@ -388,7 +437,6 @@
                 });
             }
 
-            // Ép buộc các ca tích cấm nhanh thành 'busy' trên mọi ngày
             checkedBusyShifts.forEach(sId => {
                 DAY_NAMES.forEach((_, dIdx) => {
                     currentMatrixState[`${sId}_${dIdx}`] = 'busy';
@@ -423,7 +471,6 @@
             });
         }
 
-        // Chỉ chuyển đổi trực tiếp giữa 'free' và 'busy'
         function toggleMatrixCell(key) {
             const currentState = currentMatrixState[key] || 'free';
             let nextState = (currentState === 'free') ? 'busy' : 'free';
@@ -504,42 +551,6 @@
             });
         }
 
-        function editEmployee(idx) {
-            editingIndex = idx;
-            const emp = employees[idx];
-
-            document.getElementById("empName").value = emp.name;
-            document.getElementById("empLevel").value = emp.level;
-            document.getElementById("empMaxShifts").value = emp.maxShifts;
-
-            document.querySelectorAll('input[name="quickBusyShift"]').forEach(cb => cb.checked = false);
-
-            currentMatrixState = JSON.parse(JSON.stringify(emp.matrix || createDefaultMatrix('free')));
-            renderMatrixForm();
-
-            document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-user-pen text-indigo-600"></i> Chỉnh Sửa: ${emp.name}`;
-            document.getElementById("saveEmpBtn").innerText = "✓ Cập Nhật Thông Tin Nhân Viên";
-            document.getElementById("saveEmpBtn").className = "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm";
-            document.getElementById("cancelEditBtn").classList.remove("hidden");
-        }
-
-        function cancelEdit() {
-            editingIndex = -1;
-            document.getElementById("empName").value = "";
-            document.getElementById("empLevel").value = "Trung bình";
-            document.getElementById("empMaxShifts").value = "5";
-            document.getElementById("freeTextPrompt").value = "";
-            document.querySelectorAll('input[name="quickBusyShift"]').forEach(cb => cb.checked = false);
-
-            currentMatrixState = createDefaultMatrix('free');
-            renderMatrixForm();
-
-            document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-user-plus text-indigo-600"></i> Nhập Thông Tin & Đăng Ký Ca`;
-            document.getElementById("saveEmpBtn").innerText = "+ Thêm Nhân Viên Vào Danh Sách";
-            document.getElementById("saveEmpBtn").className = "w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm";
-            document.getElementById("cancelEditBtn").classList.add("hidden");
-        }
-
         function saveEmployee() {
             const nameInput = document.getElementById("empName");
             const name = nameInput.value.trim().toUpperCase();
@@ -564,7 +575,7 @@
                 }
             }
 
-            cancelEdit();
+            closeModal();
             renderEmployeeList();
             initScheduleTable();
             updateStats();
@@ -577,7 +588,6 @@
                     if (scheduleState[key].emp === empName) delete scheduleState[key];
                 }
                 employees.splice(idx, 1);
-                if (editingIndex === idx) cancelEdit();
                 renderEmployeeList();
                 initScheduleTable();
                 updateStats();
@@ -681,7 +691,6 @@
 
                     let candidates = employees.filter(e => {
                         const cellState = (e.matrix || {})[key];
-                        // Chỉ lấy nhân viên có trạng thái 'free'
                         if (cellState !== 'free') return false; 
                         if (workedToday.has(e.name)) return false;
                         if (enforceMaxShifts && counts[e.name] >= e.maxShifts) return false;
